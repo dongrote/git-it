@@ -496,6 +496,6 @@ class Gitit:
     abs_ticket_dir = os.path.join(repo.find_root(), it.TICKET_DIR)
     git.command_lines('reset', ['HEAD', abs_ticket_dir])
     misc.rmdirs(abs_ticket_dir)
-    print 'ticket \'%s\' taken' % sha7
+    print 'ticket \'%s\' left alone' % sha7
   
 
