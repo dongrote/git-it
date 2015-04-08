@@ -17,7 +17,7 @@ Typical commands to get started with git-it is:
 
 Then, typical workflow with git-it is:
 - Retrieve all remote ticket changes:
-	it sync
+	it pull
 
 - List all tickets:
 	it list

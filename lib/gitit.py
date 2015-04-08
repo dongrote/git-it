@@ -67,6 +67,14 @@ def cmp_by_release_dir(dir1, dir2):
   else:
     return -versionCmp(title1, title2)
 
+def pre_push_pull_check():
+  if git.has_unstaged_changes():
+    print 'current working tree has unstaged changes. aborting.'
+    sys.exit(1)
+  if git.has_uncommitted_changes():
+    print 'current working tree has uncommitted changes. aborting.'
+    sys.exit(1)
+
 
 class Gitit:
   def __init__(self):
@@ -226,16 +234,18 @@ class Gitit:
   def show(self, sha):
     i, _, fullsha, _ = self.get_ticket(sha)
     i.print_ticket(fullsha)
+
+  def push(self):
+    pre_push_pull_check()
+    curr = git.current_branch()
+    os.system('git checkout git-it')
+    os.system('git push origin')
+    os.system('git checkout \'%s\'' % curr)
   
-  def sync(self):
+  def pull(self):
     # check whether this working tree has unstaged/uncommitted changes
     # in order to prevent data loss from happening
-    if git.has_unstaged_changes():
-      print 'current working tree has unstaged changes. aborting.'
-      sys.exit(1)
-    if git.has_uncommitted_changes():
-      print 'current working tree has uncommitted changes. aborting.'
-      sys.exit(1)
+    pre_push_pull_check()
 
     # now we may sync the git-it branch safely!
     curr = git.current_branch()

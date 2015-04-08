@@ -21,7 +21,8 @@ def usage():
   print '  edit      Edits an existing issue.'
   print '  rm -f     Removes an existing ticket.'
   print '  mv        Moves the given ticket to a release.'
-  print '  sync      Retrieves all remote ticket changes.'
+  print '  push      Push all local ticket changes to origin.'
+  print '  pull      Retrieves all remote ticket changes.'
   print ''
   print 'Taking responsibility:'
   print '  take      Take responsibility for this ticket and put it'
@@ -63,7 +64,7 @@ if len(params) == 0:
 # Valid subcommand?
 subcmd = params[0]
 del params[0]
-if not subcmd in [ 'init', 'list', 'show', 'new', 'edit', 'mv', 'rm', 'reopen', 'close', 'fix', 'reject', 'test', 'take', 'leave', 'sync' ]:
+if not subcmd in [ 'init', 'list', 'show', 'new', 'edit', 'mv', 'rm', 'reopen', 'close', 'fix', 'reject', 'test', 'take', 'leave', 'pull', 'push' ]:
   log.printerr('Unknown subcommand \'%s\'.' % subcmd)
   usage()
   sys.exit(1)
@@ -145,6 +146,8 @@ elif subcmd == 'leave':
     log.printerr('usage: it leave <id>')
     sys.exit(1)
   g.leave_ticket(params[0])
-elif subcmd == 'sync':
-  g.sync()
+elif subcmd == 'pull':
+  g.pull()
+elif subcmd == 'push':
+  g.push()
 
