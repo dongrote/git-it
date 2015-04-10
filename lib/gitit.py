@@ -79,7 +79,7 @@ def pre_push_pull_check():
 class Gitit:
   def __init__(self):
     pass
-  
+
   def itdb_exists(self):
     if git.branch_exists(it.ITDB_BRANCH):
       ls = git.full_tree(it.ITDB_BRANCH)
@@ -88,7 +88,7 @@ class Gitit:
         if file == abs_hold_file:
           return True
       return False
-  
+
   def require_itdb(self):
     """
     This method asserts that the itdb is initialized, or errors if not.
@@ -97,13 +97,13 @@ class Gitit:
       log.printerr('itdb not yet initialized. run \'it init\' first to ' + \
                    'create a new itdb.')
       sys.exit(1)
-  
+
   def init(self):
     if self.itdb_exists():
       print 'Already initialized issue database in branch \'%s\'.' % \
                                                              it.ITDB_BRANCH
       return
-    
+
     # else, initialize the new .it database alongside the .git repo
     gitrepo = repo.find_git_repo()
     if not gitrepo:
@@ -116,7 +116,7 @@ class Gitit:
       misc.write_file_contents(hold_file, \
              'This is merely a placeholder file for git-it that prevents ' + \
              'this directory from\nbeing pruned by Git.')
-      
+
       # Commit the new itdb to the repo
       curr_branch = git.current_branch()
       git.change_head_branch('git-it')
@@ -130,7 +130,7 @@ class Gitit:
       git.command_lines('reset', ['HEAD', abs_ticket_dir])
       misc.rmdirs(abs_ticket_dir)
       print 'Initialized empty ticket database.'
-  
+
   def match_or_error(self, sha):
     self.require_itdb()
     files = git.full_tree(it.ITDB_BRANCH + ':' + it.TICKET_DIR)
@@ -139,7 +139,7 @@ class Gitit:
       _, file = os.path.split(path)
       if file.startswith(sha):
         matches.append(path)
-    
+
     if len(matches) == 0:
       log.printerr('no such ticket')
       sys.exit(1)
@@ -151,7 +151,7 @@ class Gitit:
       sys.exit(1)
     else:
       return os.path.join(it.TICKET_DIR, matches[0])
-  
+
   def edit(self, sha):
     i, rel, fullsha, match = self.get_ticket(sha)
     sha7 = misc.chop(fullsha, 7)
@@ -191,7 +191,7 @@ class Gitit:
 
     # Remove the temporary file
     os.remove(it.EDIT_TMP_FILE)
-  
+
   def mv(self, sha, to_rel):
     self.require_itdb()
     i, rel, fullsha, src_path = self.get_ticket(sha)
@@ -230,7 +230,7 @@ class Gitit:
     except OSError, e:
       log.printerr('could not move ticket \'%s\' to \'%s\':' % (sha7, to_rel))
       log.printerr(e)
-  
+
   def show(self, sha):
     i, _, fullsha, _ = self.get_ticket(sha)
     i.print_ticket(fullsha)
@@ -241,7 +241,7 @@ class Gitit:
     os.system('git checkout git-it')
     os.system('git push origin')
     os.system('git checkout \'%s\'' % curr)
-  
+
   def pull(self):
     # check whether this working tree has unstaged/uncommitted changes
     # in order to prevent data loss from happening
@@ -252,7 +252,7 @@ class Gitit:
     os.system('git checkout git-it')
     os.system('git pull')
     os.system('git checkout \'%s\'' % curr)
-  
+
   def new(self):
     self.require_itdb()
 
@@ -290,21 +290,25 @@ class Gitit:
     git.command_lines('reset', ['HEAD', abs_ticket_dir])
     misc.rmdirs(abs_ticket_dir)
     return i
-  
+
   def progress_bar(self, percentage_done, width = 32):
     blocks_done = int(percentage_done * 1.0 * width)
     format_string_done = ('%%-%ds' % blocks_done) % ''
     format_string_togo = ('%%-%ds' % (width - blocks_done)) % ''
     return '[' + colors.colors['black-on-green'] + format_string_done + \
-           colors.colors['default'] + format_string_togo + '] %d%%' % \
-           int(percentage_done * 100)
+        colors.colors['default'] + format_string_togo + '] %d%%' % \
+        int(percentage_done * 100)
+
 
   def __print_ticket_rows(self, rel, tickets, show_types, show_progress_bar, annotate_ownership):
     print_count = 0
-    
+
     # Get the available terminal drawing space
-    _, width = os.popen('stty size').read().strip().split()
-    width = int(width)
+    if os.isatty(sys.stdout.fileno()):
+      _, width = os.popen('stty size').read().strip().split()
+      width = int(width)
+    else:
+      width = 80
 
     total = sum([t.weight for t in tickets if t.status != 'rejected']) * 1.0
     done = sum([t.weight for t in tickets if t.status not in ['open', 'rejected', 'test']]) * 1.0
@@ -361,9 +365,9 @@ class Gitit:
       print ''
     else:
       pass
-      
+
     return print_count
-	
+
   def list(self, show_types = ['open', 'test'], releases_filter = []):
     self.require_itdb()
     releasedirs = filter(lambda x: x[1] == 'tree', git.tree(it.ITDB_BRANCH + \
@@ -398,14 +402,14 @@ class Gitit:
 
       # Store the tickets in the inbox if neccessary
       inbox += filter(lambda t: t.is_mine(), tickets)
-      
+
       print_count += self.__print_ticket_rows(rel, tickets, show_types, True, True)
 
     print_count += self.__print_ticket_rows('INBOX', inbox, (show_types == ['open','test']) and ['open'] or show_types, False, False)
 
     if print_count == 0:
       print 'use the -a flag to show all tickets'
-  
+
   def rm(self, sha):
     match = self.match_or_error(sha)
     print match
@@ -423,7 +427,7 @@ class Gitit:
     git.command_lines('reset', ['HEAD', abs_ticket_dir])
     misc.rmdirs(abs_ticket_dir)
     print 'ticket \'%s\' removed'% sha7
-  
+
   def get_ticket(self, sha):
     match = self.match_or_error(sha)
     contents = git.cat_file(it.ITDB_BRANCH + ':' + match)
@@ -432,7 +436,7 @@ class Gitit:
     sha7 = misc.chop(fullsha, 7)
     i = ticket.create_from_lines(contents, fullsha, rel, True)
     return (i, rel, fullsha, match)
-  
+
   def finish_ticket(self, sha, new_status):
     i, _, fullsha, match = self.get_ticket(sha)
     sha7 = misc.chop(fullsha, 7)
@@ -453,7 +457,7 @@ class Gitit:
     git.command_lines('reset', ['HEAD', abs_ticket_dir])
     misc.rmdirs(abs_ticket_dir)
     print 'ticket \'%s\' %s' % (sha7, new_status)
-  
+
   def reopen_ticket(self, sha):
     i, _, fullsha, match = self.get_ticket(sha)
     sha7 = misc.chop(sha, 7)
@@ -507,5 +511,3 @@ class Gitit:
     git.command_lines('reset', ['HEAD', abs_ticket_dir])
     misc.rmdirs(abs_ticket_dir)
     print 'ticket \'%s\' left alone' % sha7
-  
-
