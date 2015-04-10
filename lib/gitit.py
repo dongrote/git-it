@@ -293,7 +293,10 @@ class Gitit:
 
   def progress_bar(self, percentage_done, width = 32):
     blocks_done = int(percentage_done * 1.0 * width)
-    format_string_done = ('%%-%ds' % blocks_done) % ''
+    if os.isatty(sys.stdout.fileno()):
+      format_string_done = ('%%-%ds' % blocks_done) % ''
+    else:
+      format_string_done = ('%%-%ds' % blocks_done) % ('|' * blocks_done)
     format_string_togo = ('%%-%ds' % (width - blocks_done)) % ''
     return '[' + colors.colors['black-on-green'] + format_string_done + \
         colors.colors['default'] + format_string_togo + '] %d%%' % \
