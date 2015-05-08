@@ -364,6 +364,7 @@ class Gitit:
                { 'id': 'status',   'width': 8, 'visible': not hide_status },
                { 'id': 'date',     'width': 6, 'visible': True },
                { 'id': 'prio',     'width': 4, 'visible': True },
+               { 'id': 'hrs',      'width': 4, 'visible': True },
              ]
 
       # Calculate the real value for the zero-width column

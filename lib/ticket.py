@@ -68,6 +68,9 @@ def create_interactive():
   i.release = ask_for_pattern('Release: ').strip()
   if i.release == '':
     i.release = 'uncategorized'
+  i.devtime = ask_for_pattern('Development time: ').strip()
+  if i.devtime == '':
+	i.devtime = '-'
   #i.body = ask_for_multiline_pattern('Describe the ticket:\n')
   i.status = 'open'
   i.date = datetime.datetime.now()
@@ -121,6 +124,8 @@ def create_from_lines(array_with_lines, id = None, release = None, backward_comp
     i.weight = int(ticket['Weight'])
   i.status = ticket['Status']
   i.assigned_to = ticket['Assigned to']
+  if ticket.has_key('Development time'):
+	i.devtime = ticket['Development time']
 
   # Properties that are not part of the content, but of the location of the file
   # These properties may be overwritten by the caller, else we will use defaults
@@ -187,6 +192,7 @@ class Ticket:
     self.assigned_to = '-'
     self.weight = 3  # the weight of 'minor' by default
     self.release = 'uncategorized'
+    self.devtime = '-'
 
   def is_mine(self):
     fullname = os.popen('git config user.name').read().strip()
@@ -229,6 +235,8 @@ class Ticket:
       elif id == 'wght':
         weightstr = self.weight_names[min(3, max(0, int(round(math.log(self.weight, 3)))))]
         colstrings.append(misc.pad_to_length(weightstr, 5))
+      elif id == 'hrs':
+		colstrings.append(misc.pad_to_length(self.devtime, w))
 
     return ' '.join(colstrings)
 
@@ -242,6 +250,7 @@ class Ticket:
                 'Status: %s'      % self.status,
                 'Assigned to: %s' % self.assigned_to,
                 'Release: %s'     % self.release,
+				'Development time: %s' % self.devtime,
                 '',
                 self.body
               ]
@@ -267,6 +276,7 @@ class Ticket:
     self.print_ticket_field('Status', self.status, None, self.status_colors[self.status])
     self.print_ticket_field('Assigned to', self.assigned_to)
     self.print_ticket_field('Release', self.release)
+    self.print_ticket_field('Development time', self.devtime)
     print ''
     print self.body
 
@@ -283,6 +293,7 @@ class Ticket:
                 'Weight: %d'      % self.weight,
                 'Status: %s'      % self.status,
                 'Assigned to: %s' % self.assigned_to,
+				'Development time: %s' % self.devtime,
                 '',
                 self.body
               ]
