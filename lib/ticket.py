@@ -235,7 +235,7 @@ class Ticket:
       elif id == 'wght':
         weightstr = self.weight_names[min(3, max(0, int(round(math.log(self.weight, 3)))))]
         colstrings.append(misc.pad_to_length(weightstr, 5))
-      elif id == 'hrs':
+      elif id == 'hours':
 		colstrings.append(misc.pad_to_length(self.devtime, w))
 
     return ' '.join(colstrings)
