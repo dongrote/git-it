@@ -232,8 +232,31 @@ class Gitit:
       log.printerr(e)
 
   def show(self, sha):
-    i, _, fullsha, _ = self.get_ticket(sha)
-    i.print_ticket(fullsha)
+    if sha == 'all':
+        self.show_all()
+    else:
+        i, _, fullsha, _ = self.get_ticket(sha)
+        i.print_ticket(fullsha)
+
+  def show_all(self):
+    # code adapted from self.list()
+    self.require_itdb()
+    releasedirs = filter(lambda x: x[1] == 'tree', git.tree(it.ITDB_BRANCH + \
+                                                         ':' + it.TICKET_DIR))
+    # Show message if no tickets there
+    if len(releasedirs) == 0:
+      print 'no tickets yet. use \'it new\' to add new tickets.'
+      return
+
+    releasedirs.sort(cmp_by_release_dir)
+    for _, _, sha, rel in releasedirs:
+      reldir = os.path.join(it.TICKET_DIR, rel)
+      ticketfiles = git.tree(it.ITDB_BRANCH + ':' + reldir)
+      for _, _, sha, fullsha in ticketfiles:
+        if fullsha == it.HOLD_FILE:
+          continue
+        self.show(fullsha)
+        print ''
 
   def push(self):
     pre_push_pull_check()
