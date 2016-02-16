@@ -5,7 +5,7 @@ setup(name='git-it',
     version='1.1',
     description='Issue tracking for git repositories',
     author='Don Grote',
-    author_email='don.grote@gmail.com',
+    author_email='dgrote@tacnetsol.com',
     packages=['gitit'],
     scripts=['bin/it'],
     )

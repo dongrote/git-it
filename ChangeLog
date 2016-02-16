@@ -1,0 +1,18 @@
+v1.1
+Added `it assign` command to easy assigning of tickets to other users
+`it new` asks to fill in the 'Assign to: ' field instead of 'Development time: '
+`it new` immediately opens a ticket for editing after creating the ticket
+`it edit` performs a lookup for the preferred editor in the following locations,
+  in this exact order:
+    - git config --local core.editor
+    - git config --global core.editor
+    - git config --system core.editor
+    - $GIT_EDITOR
+    - $EDITOR
+    - 'nano'
+`it rm` no longer requires '-f', nor does it appear to "hang" awaiting user input
+git-it can now be installed globally using `sudo python setup.py install`
+Added a ChangeLog
+
+v1.0
+Initial release

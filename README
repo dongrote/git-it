@@ -3,7 +3,7 @@ tickets alongside Git-managed source code for a project, to keep a managed list
 of issues, bugs, features or tasks in sync with co-developers and to manage
 project and milestone progress.
 
-Typical commands to get started with git-it is:
+Typical commands to get started with git-it are:
 - Initialize a new ticket database:
 	it init
 
@@ -20,13 +20,14 @@ Then, typical workflow with git-it is:
 	it pull
 
 - List all tickets:
-	it list
+	it list [-a]
 
 - Add a new ticket:
 	it new
 
 - Take or let go of responsibility for a ticket
 	it take <ticket-id>
+	it assign <ticket-id> <owner>
 	it leave <ticket-id>
 
 - Close/reopen existing tickets:
@@ -41,3 +42,4 @@ Then, typical workflow with git-it is:
 
 Authors:
 Vincent Driessen <vincent@datafox.nl>
+Don Grote <dgrote@tacnetsol.com>
