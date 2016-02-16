@@ -446,8 +446,6 @@ class Gitit:
 
   def rm(self, sha):
     match = self.match_or_error(sha)
-    print match
-    raw_input()
     _, basename = os.path.split(match)
     sha7 = misc.chop(basename, 7)
 
