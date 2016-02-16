@@ -3,151 +3,232 @@
 # Command-line access to the base implementation of git-it.
 #
 import sys, os
-import getopt
+from argparse import ArgumentParser
 
 # Point Python to the lib directory to include libraries
 sys.path += [ os.path.abspath(sys.path[0] + '/..') + '/lib' ]
 import gitit
-import log
 
-def usage():
-  print 'usage: it <subcommand> [<options>]'
-  print ''
-  print 'Valid subcommands are:'
-  print '  init      Initializes an area for storing issues.'
-  print '  list      Shows a list of all issues.'
-  print '  show      Shows details of a specific issue.'
-  print '  new       Adds a new issue.'
-  print '  edit      Edits an existing issue.'
-  print '  rm -f     Removes an existing ticket.'
-  print '  mv        Moves the given ticket to a release.'
-  print '  push      Push all local ticket changes to origin.'
-  print '  pull      Retrieves all remote ticket changes.'
-  print ''
-  print 'Taking responsibility:'
-  print '  take      Take responsibility for this ticket and put it'
-  print '            in your INBOX (i.e. assign it to yourself).'
-  print '  leave     Let go responsibility for this ticket and remove'
-  print '            it from your INBOX.'
-  print ''
-  print 'Changing status:'
-  print '  test      Mark a ticket as to-test.'
-  print '  close     Mark a ticket as closed.'
-  print '  fix       Mark a ticket as fixed.'
-  print '  reject    Mark a ticket as rejected.'
-  print '  reopen    Reopens an issue.'
+class Commander(object):
+    @staticmethod
+    def create_init_parser(subparser):
+        parser = subparser.add_parser('init',
+            help='initialize issue tracking database')
+        return parser
+
+    @staticmethod
+    def do_init(gitobj, args):
+        gitobj.init()
+        return 0
+
+    @staticmethod
+    def create_list_parser(subparser):
+        parser = subparser.add_parser('list', help='List issues')
+        parser.add_argument('-a', '--all', action='store_true', default=False,
+            help='list all tickets, including those that are not open')
+        return parser
+
+    @staticmethod
+    def do_list(gitobj, args):
+        types = ['open', 'test']
+        if args.all:
+            types += [ 'closed', 'fixed', 'rejected' ]
+        gitobj.list(types)
+        return 0
+
+    @staticmethod
+    def create_show_parser(subparser):
+        parser = subparser.add_parser('show',
+            help='show details of a specific issue')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_show(gitobj, args):
+        gitobj.show(args.ticket)
+        return 0
+
+    @staticmethod
+    def create_new_parser(subparser):
+        parser = subparser.add_parser('new', help='create a new issue')
+        return parser
+
+    @staticmethod
+    def do_new(gitobj, args):
+        gitobj.new()
+        return 0
+
+    @staticmethod
+    def create_edit_parser(subparser):
+        parser = subparser.add_parser('edit', help='edit an existing issue')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_edit(gitobj, args):
+        gitobj.edit(args.ticket)
+        return 0
+
+    @staticmethod
+    def create_rm_parser(subparser):
+        parser = subparser.add_parser('rm', help='remove an existing issue')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_rm(gitobj, args):
+        gitobj.rm(args.ticket)
+        return 0
+
+    @staticmethod
+    def create_mv_parser(subparser):
+        parser = subparser.add_parser('mv',
+            help='move a given ticket to a different/new release')
+        parser.add_argument('ticket')
+        parser.add_argument('release')
+        return parser
+
+    @staticmethod
+    def do_mv(gitobj, args):
+        gitobj.mv(args.ticket, args.release)
+
+    @staticmethod
+    def create_push_parser(subparser):
+        parser = subparser.add_parser('push', help='push changes to origin')
+        return parser
+
+    @staticmethod
+    def do_push(gitobj, args):
+        gitobj.push()
+        return 0
+
+    @staticmethod
+    def create_pull_parser(subparser):
+        parser = subparser.add_parser('pull',
+            help='pull ticket changes from origin')
+        return parser
+
+    @staticmethod
+    def do_pull(gitobj, args):
+        gitobj.pull()
+        return 0
+
+    @staticmethod
+    def create_take_parser(subparser):
+        parser = subparser.add_parser('take',
+            help='take ownership of an existing issue')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_take(gitobj, args):
+        gitobj.take_ticket(args.ticket)
+        return 0
+
+    @staticmethod
+    def create_assign_parser(subparser):
+        parser = subparser.add_parser('assign',
+            help='assign ownership of an existing issue to a developer')
+        parser.add_argument('ticket')
+        parser.add_argument('owner')
+        return parser
+
+    @staticmethod
+    def do_assign(gitobj, args):
+        raise NotImplementedError
+
+    @staticmethod
+    def create_release_parser(subparser):
+        parser = subparser.add_parser('release',
+            help='release ownership of an issue you currently own')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_release(gitobj, args):
+        gitobj.leave_ticket(args.ticket)
+        return 0
+
+    @staticmethod
+    def create_test_parser(subparser):
+        parser = subparser.add_parser('test', help='mark an issue as to-test')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_test(gitobj, args):
+        gitobj.finish_ticket(args.ticket, 'test')
+        return 0
+
+    @staticmethod
+    def create_close_parser(subparser):
+        parser = subparser.add_parser('close', help='mark an issue as closed')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_close(gitobj, args):
+        gitobj.finish_ticket(args.ticket, 'closed')
+        return 0
+
+    @staticmethod
+    def create_fix_parser(subparser):
+        parser = subparser.add_parser('fix', help='mark an issue as fixed')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_fix(gitobj, args):
+        gitobj.finish_ticket(args.ticket, 'fixed')
+        return 0
+
+    @staticmethod
+    def create_reject_parser(subparser):
+        parser = subparser.add_parser('reject', help='mark an issue as rejected')
+        parser.add_argument('ticket')
+        parser.add_argument('-m', '--message', help='rejetion message',
+            default=None)
+        return parser
+
+    @staticmethod
+    def do_reject(gitobj, args):
+        # TODO incorporate rejection message before closing up ticket
+        gitobj.finish_ticket(args.ticket, 'rejected')
+        return 0
+
+    @staticmethod
+    def create_reopen_parser(subparser):
+        parser = subparser.add_parser('reopen', help='reopen an issue')
+        parser.add_argument('ticket')
+        return parser
+
+    @staticmethod
+    def do_reopen(gitobj, args):
+        gitobj.reopen_ticket(args.ticket)
+        return 0
+
 
 # Parse input options
-opts = []
-params = []
-try:
-  shorts = 'h'
-  longs  = [ ]
-  opts, params = getopt.getopt(sys.argv[1:], shorts, longs)
-except getopt.GetoptError, e:
-  log.printerr(e)
-  usage()
-  sys.exit(1)
+parser = ArgumentParser()
+subparser = parser.add_subparsers(dest='cmd')
+Commander.create_init_parser(subparser)
+Commander.create_list_parser(subparser)
+Commander.create_show_parser(subparser)
+Commander.create_new_parser(subparser)
+Commander.create_edit_parser(subparser)
+Commander.create_rm_parser(subparser)
+Commander.create_mv_parser(subparser)
+Commander.create_push_parser(subparser)
+Commander.create_pull_parser(subparser)
+Commander.create_take_parser(subparser)
+Commander.create_assign_parser(subparser)
+Commander.create_release_parser(subparser)
+Commander.create_test_parser(subparser)
+Commander.create_close_parser(subparser)
+Commander.create_fix_parser(subparser)
+Commander.create_reject_parser(subparser)
+Commander.create_reopen_parser(subparser)
 
-# Set variables according to input options
-for key, val in opts:
-  if key in [ '-h' ]:
-    usage()
-    sys.exit(0)
-
-# No subcommand?
-if len(params) == 0:
-  log.printerr('No subcommand specified.')
-  usage()
-  sys.exit(1)
-
-# Valid subcommand?
-subcmd = params[0]
-del params[0]
-if not subcmd in [ 'init', 'list', 'show', 'new', 'edit', 'mv', 'rm', 'reopen', 'close', 'fix', 'reject', 'test', 'take', 'leave', 'pull', 'push' ]:
-  log.printerr('Unknown subcommand \'%s\'.' % subcmd)
-  usage()
-  sys.exit(1)
-
-# Main logic
+args = parser.parse_args(sys.argv[1:])
 g = gitit.Gitit()
-if subcmd == 'init':
-  g.init()
-elif subcmd == 'new':
-  g.new()
-elif subcmd == 'list':
-  types = ['open', 'test']
-  if len(params) > 0:
-    if params[0] == '-a':
-      types += [ 'closed', 'fixed', 'rejected' ]
-      del params[0]
-  releases = []
-  if len(params) > 0:
-    releases += params
-  g.list(types, releases)
-elif subcmd == 'edit':
-  if len(params) != 1:
-    log.printerr('usage: it edit <id>')
-    sys.exit(1)
-  g.edit(params[0])
-elif subcmd == 'show':
-  if len(params) != 1:
-    log.printerr('usage: it show <id>')
-    sys.exit(1)
-  g.show(params[0])
-elif subcmd == 'mv':
-  if len(params) != 2:
-    log.printerr('usage: it mv <id> <release>')
-    sys.exit(1)
-  g.mv(params[0], params[1])
-elif subcmd == 'rm':
-  if len(params) != 2 or params[0] != '-f':
-    log.printerr('tickets can be closed with either of the following subcommands:')
-    log.printerr('  fix')
-    log.printerr('  reject')
-    log.printerr('  close')
-    log.printerr('')
-    log.printerr('to permanently remove a ticket instead of closing it, use:')
-    log.printerr('  it rm -f <id>')
-    sys.exit(1)
-  g.rm(params[1])
-elif subcmd == 'close':
-  if len(params) != 1:
-    log.printerr('usage: it close <id>')
-    sys.exit(1)
-  g.finish_ticket(params[0], 'closed')
-elif subcmd == 'fix':
-  if len(params) != 1:
-    log.printerr('usage: it fix <id>')
-    sys.exit(1)
-  g.finish_ticket(params[0], 'fixed')
-elif subcmd == 'reject':
-  if len(params) != 1:
-    log.printerr('usage: it close <id>')
-    sys.exit(1)
-  g.finish_ticket(params[0], 'rejected')
-elif subcmd == 'test':
-  if len(params) != 1:
-    log.printerr('usage: it test <id>')
-    sys.exit(1)
-  g.finish_ticket(params[0], 'test')
-elif subcmd == 'reopen':
-  if len(params) != 1:
-    log.printerr('usage: it reopen <id>')
-    sys.exit(1)
-  g.reopen_ticket(params[0])
-elif subcmd == 'take':
-  if len(params) != 1:
-    log.printerr('usage: it take <id>')
-    sys.exit(1)
-  g.take_ticket(params[0])
-elif subcmd == 'leave':
-  if len(params) != 1:
-    log.printerr('usage: it leave <id>')
-    sys.exit(1)
-  g.leave_ticket(params[0])
-elif subcmd == 'pull':
-  g.pull()
-elif subcmd == 'push':
-  g.push()
-
+sys.exit(getattr(Commander, 'do_%s' % args.cmd)(g,args))
