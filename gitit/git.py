@@ -90,5 +90,30 @@ def has_uncommitted_changes():
     ['--cached','--quiet','--ignore-submodules','HEAD','--'])
   return exitcode != 0
 
+def get_editor():
+  # fetch the editor command from the following sources in this order:
+  #  - git config --local core.editor
+  #  - git config --global core.editor
+  #  - git config --system core.editor
+  #  - $GIT_EDITOR
+  #  - $EDITOR
+  #  - nano
+  output = command_lines('config', ['--local', 'core.editor'])
+  if output[0] != '':
+    return output[0]
+  output = command_lines('config', ['--global', 'core.editor'])
+  if output[0] != '':
+    return output[0]
+  output = command_lines('config', ['--system', 'core.editor'])
+  if output[0] != '':
+    return output[0]
+  output = os.getenv('GIT_EDITOR')
+  if output is not None:
+    return output
+  output = os.getenv('EDITOR')
+  if output is not None:
+    return output
+  return 'nano'
+
 if __name__ == '__main__':
   print full_tree(current_branch())

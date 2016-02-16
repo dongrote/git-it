@@ -159,7 +159,14 @@ class Gitit:
     # Save the contents of this ticket to a file, so it can be edited
     i.save(it.EDIT_TMP_FILE)
     timestamp1 = os.path.getmtime(it.EDIT_TMP_FILE)
-    success = os.system('vim "%s"' % it.EDIT_TMP_FILE) == 0
+    # fetch the editor command from the following sources in this order:
+    #  - git config --local core.editor
+    #  - git config --global core.editor
+    #  - git config --system core.editor
+    #  - $GIT_EDITOR
+    #  - $EDITOR
+    #  - /usr/bin/nano
+    success = os.system('%s "%s"' % (git.get_editor(),it.EDIT_TMP_FILE)) == 0
     timestamp2 = os.path.getmtime(it.EDIT_TMP_FILE)
     if success:
       if timestamp1 < timestamp2:
