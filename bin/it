@@ -2,12 +2,9 @@
 #
 # Command-line access to the base implementation of git-it.
 #
-import sys, os
+import sys
 from argparse import ArgumentParser
-
-# Point Python to the lib directory to include libraries
-sys.path += [ os.path.abspath(sys.path[0] + '/..') + '/lib' ]
-import gitit
+from gitit.gitit import Gitit
 
 class Commander(object):
     @staticmethod
@@ -208,27 +205,30 @@ class Commander(object):
         return 0
 
 
-# Parse input options
-parser = ArgumentParser()
-subparser = parser.add_subparsers(dest='cmd')
-Commander.create_init_parser(subparser)
-Commander.create_list_parser(subparser)
-Commander.create_show_parser(subparser)
-Commander.create_new_parser(subparser)
-Commander.create_edit_parser(subparser)
-Commander.create_rm_parser(subparser)
-Commander.create_mv_parser(subparser)
-Commander.create_push_parser(subparser)
-Commander.create_pull_parser(subparser)
-Commander.create_take_parser(subparser)
-Commander.create_assign_parser(subparser)
-Commander.create_release_parser(subparser)
-Commander.create_test_parser(subparser)
-Commander.create_close_parser(subparser)
-Commander.create_fix_parser(subparser)
-Commander.create_reject_parser(subparser)
-Commander.create_reopen_parser(subparser)
+def main():
+    # Parse input options
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers(dest='cmd')
+    Commander.create_init_parser(subparser)
+    Commander.create_list_parser(subparser)
+    Commander.create_show_parser(subparser)
+    Commander.create_new_parser(subparser)
+    Commander.create_edit_parser(subparser)
+    Commander.create_rm_parser(subparser)
+    Commander.create_mv_parser(subparser)
+    Commander.create_push_parser(subparser)
+    Commander.create_pull_parser(subparser)
+    Commander.create_take_parser(subparser)
+    Commander.create_assign_parser(subparser)
+    Commander.create_release_parser(subparser)
+    Commander.create_test_parser(subparser)
+    Commander.create_close_parser(subparser)
+    Commander.create_fix_parser(subparser)
+    Commander.create_reject_parser(subparser)
+    Commander.create_reopen_parser(subparser)
 
-args = parser.parse_args(sys.argv[1:])
-g = gitit.Gitit()
-sys.exit(getattr(Commander, 'do_%s' % args.cmd)(g,args))
+    args = parser.parse_args(sys.argv[1:])
+    return getattr(Commander, 'do_%s' % args.cmd)(Gitit(),args)
+
+if '__main__' == __name__:
+    sys.exit(main())
