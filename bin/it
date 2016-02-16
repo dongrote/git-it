@@ -52,7 +52,8 @@ class Commander(object):
 
     @staticmethod
     def do_new(gitobj, args):
-        gitobj.new()
+        ticket = gitobj.new()
+        gitobj.edit(ticket.id)
         return 0
 
     @staticmethod
