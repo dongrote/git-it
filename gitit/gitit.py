@@ -514,21 +514,23 @@ class Gitit:
     print 'ticket \'%s\' reopened' % sha7
 
   def take_ticket(self, sha):
+    self.assign_ticket(sha, os.popen('git config user.name').read().strip())
+
+  def assign_ticket(self, sha, user):
     i, _, fullsha, match = self.get_ticket(sha)
     sha7 = misc.chop(sha, 7)
 
     curr_branch = git.current_branch()
     git.change_head_branch('git-it')
-    fullname = os.popen('git config user.name').read().strip()
-    msg = 'ticket \'%s\' taken by %s' % (sha7, fullname)
-    i.assigned_to = fullname
+    msg = 'ticket \'%s\' assigned to %s' % (sha7, user)
+    i.assigned_to = user
     i.save()
     git.command_lines('commit', ['-m', msg, match], from_root=True)
     git.change_head_branch(curr_branch)
     abs_ticket_dir = os.path.join(repo.find_root(), it.TICKET_DIR)
     git.command_lines('reset', ['HEAD', abs_ticket_dir])
     misc.rmdirs(abs_ticket_dir)
-    print 'ticket \'%s\' taken' % sha7
+    print 'ticket \'%s\' assigned' % sha7
 
   def leave_ticket(self, sha):
     i, _, fullsha, match = self.get_ticket(sha)

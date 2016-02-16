@@ -132,7 +132,8 @@ class Commander(object):
 
     @staticmethod
     def do_assign(gitobj, args):
-        raise NotImplementedError
+        gitobj.assign_ticket(args.ticket, args.owner)
+        return 0
 
     @staticmethod
     def create_release_parser(subparser):
