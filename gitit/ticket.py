@@ -68,9 +68,9 @@ def create_interactive():
   i.release = ask_for_pattern('Release: ').strip()
   if i.release == '':
     i.release = 'uncategorized'
-  i.devtime = ask_for_pattern('Development time: ').strip()
-  if i.devtime == '':
-	i.devtime = '-'
+  i.assigned_to = ask_for_pattern('Assign to: ').strip()
+  if i.assigned_to == '':
+	i.assigned_to = '-'
   #i.body = ask_for_multiline_pattern('Describe the ticket:\n')
   i.status = 'open'
   i.date = datetime.datetime.now()
