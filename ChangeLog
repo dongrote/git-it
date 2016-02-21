@@ -2,6 +2,8 @@ v1.2
 Added auto-stash functionality to `it push` and `it pull`
   - If changes are detected in the current working branch, the changes are
     silently stashed and popped back in order to perform the push/pull operation
+`it new` checks that stdin is a tty before auto-launching the ticket editor
+`it reject` now demands a rejection message
 
 v1.1
 Added `it assign` command to easy assigning of tickets to other users
