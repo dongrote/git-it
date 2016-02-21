@@ -2,7 +2,7 @@
 #
 # Command-line access to the base implementation of git-it.
 #
-import sys
+import os, sys
 from argparse import ArgumentParser
 from gitit.gitit import Gitit
 
@@ -53,7 +53,8 @@ class Commander(object):
     @staticmethod
     def do_new(gitobj, args):
         ticket = gitobj.new()
-        gitobj.edit(ticket.id)
+        if os.isatty(sys.stdin.fileno()):
+            gitobj.edit(ticket.id)
         return 0
 
     @staticmethod

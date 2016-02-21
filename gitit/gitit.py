@@ -313,7 +313,7 @@ class Gitit:
         # Generate a SHA1 id
         s = sha1_constructor()
         s.update(i.__str__())
-        s.update(os.getlogin())
+        s.update(os.getenv('LOGNAME'))
         s.update(datetime.datetime.now().__str__())
         i.id = s.hexdigest()
 
