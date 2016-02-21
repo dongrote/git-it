@@ -1,3 +1,8 @@
+v1.2
+Added auto-stash functionality to `it push` and `it pull`
+  - If changes are detected in the current working branch, the changes are
+    silently stashed and popped back in order to perform the push/pull operation
+
 v1.1
 Added `it assign` command to easy assigning of tickets to other users
 `it new` asks to fill in the 'Assign to: ' field instead of 'Development time: '
