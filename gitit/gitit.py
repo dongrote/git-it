@@ -561,3 +561,25 @@ class Gitit:
         git.command_lines('reset', ['HEAD', abs_ticket_dir])
         misc.rmdirs(abs_ticket_dir)
         print 'ticket \'%s\' left alone' % sha7
+
+    def reject_ticket(self, sha, message):
+        i, _, fullsha, match = self.get_ticket(sha)
+        sha7 = misc.chop(sha, 7)
+        if 'rejected' == i.status:
+            log.printerr('ticket \'%s\' already rejected' % sha7)
+            sys.exit(1)
+        if message is None or message == '':
+            message = ticket.ask_for_pattern(
+                'Reason for rejection: ', ticket.not_empty)
+        curr_branch = git.current_branch()
+        git.change_head_branch('git-it')
+        i.status = 'rejected'
+        i.body = 'REJECTED: %s\n\n%s' % (message, i.body)
+        msg = '%s ticket \'%s\'' % (i.status, sha7)
+        i.save()
+        git.command_lines('commit', ['-m', msg, match], from_root=True)
+        git.change_head_branch(curr_branch)
+        abs_ticket_dir = os.path.join(repo.find_root(), it.TICKET_DIR)
+        git.command_lines('reset', ['HEAD', abs_ticket_dir])
+        misc.rmdirs(abs_ticket_dir)
+        print 'ticket \'%s\' rejected' % sha7

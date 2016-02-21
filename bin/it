@@ -186,14 +186,13 @@ class Commander(object):
     def create_reject_parser(subparser):
         parser = subparser.add_parser('reject', help='mark an issue as rejected')
         parser.add_argument('ticket')
-        parser.add_argument('-m', '--message', help='rejetion message',
+        parser.add_argument('-m', '--message', help='rejection message',
             default=None)
         return parser
 
     @staticmethod
     def do_reject(gitobj, args):
-        # TODO incorporate rejection message before closing up ticket
-        gitobj.finish_ticket(args.ticket, 'rejected')
+        gitobj.reject_ticket(args.ticket, args.message)
         return 0
 
     @staticmethod
